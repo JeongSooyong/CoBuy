@@ -14,6 +14,14 @@
   잘 사용하지 않던 스킬들이 있어서 많이 해맸고, 그 때문에 여기저기 많이 도움을 요청했다...
 
 
+<br><br><br><br>
+<h3>ERD</h3>
+
+
+![image](https://github.com/user-attachments/assets/4d5bf911-7fde-4680-a14e-b58f7c003132)
+
+
+
 
 
   
