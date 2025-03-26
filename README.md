@@ -28,7 +28,8 @@
 ![image](https://github.com/user-attachments/assets/70653f21-d23e-4232-a343-8069ecc32585)<br>
 회원가입 화면<br>
 테이블을 쇼핑몰, 셀러, 회원 3가지로 나누어서 회원가입
-![image](https://github.com/user-attachments/assets/2bf7e089-fdd6-4dcf-b617-574204e81da4)
+![image](https://github.com/user-attachments/assets/262fc912-cc53-4395-948c-7010926721bf)
+
 <br>
 아이디 중복 체크 기능
 <br>
