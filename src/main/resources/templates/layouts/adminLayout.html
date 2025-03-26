@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CoBuy</title>
+
+    <!-- CSRF 토큰 메타 태그 -->
+    <meta name="_csrf" th:content="${_csrf?.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
+
+    <!-- 공통 css 영역 -->
+    <th:block th:replace="fragments/adminCss :: adminCss"></th:block>
+</head>
+<body>
+<!-- 헤더 영역 -->
+<th:block th:replace="fragments/adminMenu :: adminMenu"></th:block>
+<th:block th:replace="fragments/adminHeader :: adminHeader"></th:block>
+
+<!-- 본문 영역 -->
+<div layout:fragment="content"></div>
+
+<!--자동매칭 모달-->
+<th:block th:replace="fragments/matchModal :: matchModal"></th:block>
+
+<!--쇼핑몰/인플루언서 정보 모달-->
+<th:block th:replace="fragments/infoModal :: infoModal"></th:block>
+
+<!--쇼핑몰/인플루언서 추가 모달-->
+<th:block th:replace="fragments/addModal :: addModal"></th:block>
+
+<!--주문내역 확인 모달-->
+<th:block th:replace="fragments/orderDetailModal :: orderDetailModal"></th:block>
+
+
+<!--순위 확인 모달-->
+<th:block th:replace="fragments/rankModal :: rankModal"></th:block>
+
+<!--협업요청상태 모달-->
+<th:block th:replace="fragments/requestModal :: requestModal"></th:block>
+
+<!--스크립트-->
+<th:block th:replace="fragments/script :: script"></th:block>
+<th:block layout:fragment="script"></th:block>
+</body>
+</html>

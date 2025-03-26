@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/userLayout}">
+
+
+<body class="productCont">
+<div layout:fragment="content" >
+    <div class="productWrap">
+        <ul class="productListBox">
+            <li th:each="product : ${products}">
+                <a th:href="${product.shopUrl}">
+                    <div class="imgBox">
+                        <img th:src="${product.productImages[0].imageUrl}" th:alt="${product.productName}"/>
+                    </div>
+                    <div class="txtBox">
+                        <p class="tit" th:text="${product.productName}">상품명</p>
+                        <p class="priceBox">
+                            <span class="percent" th:text="${#numbers.formatInteger((product.productOriPrice - product.productSalePrice) / product.productOriPrice * 100, 0, 'COMMA')} + '%'">36%</span>
+                            <span class="discount" th:text="${#numbers.formatInteger(product.productSalePrice, 3, 'COMMA')} + '원'">31,900원</span>
+                            <span class="price" th:text="${#numbers.formatInteger(product.productOriPrice, 3, 'COMMA')} + '원'">50,000원</span>
+                        </p>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+
+    <ul class="quickMenu">
+        <li><a href="#" class="chat">채팅 문의</a></li>
+        <li><a href="#" class="top">TOP</a></li>
+    </ul>
+</div>
+
+
+</body>
+</html>

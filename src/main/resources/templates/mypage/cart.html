@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/userLayout}">
+<head>
+    <title>장바구니</title>
+</head>
+<body class="mypageCont">
+<div layout:fragment="content">
+    <div class="mypageWrap cartWrap">
+        <div class="allChkBox">
+            <label for="allChk">
+                <input type="checkbox" id="allChk">
+                <p class="tit">전체선택 <span class="pl">(</span><span class="chkCount">0</span> / <span class="total" th:text="${#lists.size(cartItems)}">0</span><span class="pl">)</span></p>
+            </label>
+            <a href="#" class="deleteBtn">선택 삭제</a>
+        </div>
+        <div class="mypageInner">
+            <div class="noneProd" th:if="${#lists.isEmpty(cartItems)}">
+                <p class="title">장바구니에 담긴 상품이 없습니다.</p>
+                <p class="txt">원하는 상품을 담아보세요</p>
+                <a href="/product" class="moreBtn">상품 보러 가기</a>
+            </div>
+            <ul class="cartList" th:if="${not #lists.isEmpty(cartItems)}">
+                <!-- 상품 목록은 JavaScript로 동적 생성됩니다 -->
+            </ul>
+            <ul class="totalInfo" th:if="${not #lists.isEmpty(cartItems)}">
+                <li>
+                    <p class="tit">총 상품 금액</p>
+                    <p class="txt" th:text="${#numbers.formatInteger(totalProductPrice, 0, 'COMMA')} + '원'">103,000원</p>
+                </li>
+                <li>
+                    <p class="tit">총 배송비</p>
+                    <p class="txt" th:text="${#numbers.formatInteger(totalDeliveryFee, 0, 'COMMA')} + '원'">2,500원</p>
+                </li>
+                <li class="total">
+                    <p class="tit">총 결제예상 금액</p>
+                    <p class="txt" th:text="${#numbers.formatInteger(totalPrice, 0, 'COMMA')} + '원'">105,500원</p>
+                </li>
+            </ul>
+        </div>
+        <div class="orderBtnWrap" th:if="${not #lists.isEmpty(cartItems)}">
+            <a href="/pay">총 <span class="price" th:text="${#numbers.formatInteger(totalPrice, 0, 'COMMA')} + '원'">105,500원</span> 구매하기</a>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(function() {
+            // 장바구니 아이템 데이터
+            const cartItems = /*[[${cartItems}]]*/ [];
+
+            // 상품 그룹화 및 렌더링
+            function renderCartItems() {
+                const $cartList = $('.cartList');
+                $cartList.empty();
+
+                // 상품 코드별로 그룹화
+                const groupedItems = {};
+                cartItems.forEach(item => {
+                    const key = item.productCode;
+                    if (!groupedItems[key]) {
+                        groupedItems[key] = [];
+                    }
+                    groupedItems[key].push(item);
+                });
+
+                // 그룹화된 상품 렌더링
+                Object.values(groupedItems).forEach(items => {
+                    const $li = $('<li>');
+
+                    // 각 옵션별 상품 렌더링
+                    items.forEach(item => {
+                        const $listContainer = $('<div class="list">');
+                        const $checkbox = $('<input type="checkbox" class="prodChk">').attr('data-id', item.id);
+                        $listContainer.append($checkbox);
+
+                        const $itemHtml = $(`
+                            <div class="prodInfoWrap">
+                                <div class="prodBox">
+                                    <a href="/product/detail/${item.adminId}/${item.productCode}" class="prodImg">
+                                        <img src="${item.productImages[0].imageUrl}" alt="${item.productName}"/>
+                                    </a>
+                                    <div class="txtBox">
+                                        <p class="tit">${item.productName}</p>
+                                        ${item.selectedOptions ? `<p class="option"><span>${item.selectedOptions}</span></p>` : ''}
+                                        <div class="prodPrice">
+                                            <div class="countBox">
+                                                <input type="number" value="${item.quantity}" min="1" max="${item.productStock}">
+                                                <span class="plus">+</span>
+                                                <span class="minus">-</span>
+                                            </div>
+                                            <div class="priceInfo">
+                                                <p class="oriPrice">${item.productOriPrice.toLocaleString()}원</p>
+                                                <p class="price">${item.productSalePrice.toLocaleString()}원</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                        $listContainer.append($itemHtml);
+                        $li.append($listContainer);
+                    });
+
+                    // 총 가격 정보 추가
+                    const totalProductPrice = items.reduce((sum, item) => sum + (item.productSalePrice * item.quantity), 0);
+                    const $totalPrice = $(`
+                        <p class="totalPrice">
+                            <span class="prod">상품 금액 <span>${totalProductPrice.toLocaleString()}원</span></span>
+                            <span>+</span>
+                            <span class="fee">배송비 <span>${items[0].productFee.toLocaleString()}원</span></span>
+                            <span>=</span>
+                            <span class="total">${(totalProductPrice + items[0].productFee).toLocaleString()}원</span>
+                        </p>
+                    `);
+
+                    $li.append($totalPrice);
+                    $cartList.append($li);
+                });
+
+                // 이벤트 바인딩
+                bindEvents();
+                // 총액 업데이트
+                updateCartTotal();
+            }
+
+            // 이벤트 바인딩
+            function bindEvents() {
+                // 전체 선택 체크박스
+                $('#allChk').change(function() {
+                    const isChecked = $(this).prop('checked');
+                    $('.prodChk').prop('checked', isChecked);
+                    updateChkCount();
+                    updateSelectedItems();
+                });
+
+                // 개별 체크박스
+                $('.prodChk').change(function() {
+                    updateChkCount();
+                    updateSelectedItems();
+                });
+
+
+                // 수량 입력 처리
+                $('.countBox input').on('input', function() {
+                    const input = $(this);
+                    const currentValue = parseInt(input.val());
+                    const maxValue = parseInt(input.attr('max'));
+                    const itemId = input.closest('li').find('.prodChk').data('id');
+
+                    if (currentValue < 1) {
+                        alert("최소 구매 수량은 1개입니다.");
+                        input.val(1);
+                        updateCartItemQuantity(itemId, 1);
+                        return;
+                    }
+
+                    if (currentValue > maxValue) {
+                        alert("더 이상 재고가 없습니다!");
+                        input.val(maxValue);
+                        updateCartItemQuantity(itemId, maxValue);
+                        return;
+                    }
+
+                    updateCartItemQuantity(itemId, currentValue);
+                });
+
+
+                // 증가 버튼 클릭
+                $('.countBox .plus').click(function() {
+                    const input = $(this).siblings('input');
+                    const currentValue = parseInt(input.val());
+                    const maxValue = parseInt(input.attr('max'));
+                    const itemId = input.closest('li').find('.prodChk').data('id');
+
+                    if (currentValue >= maxValue) {
+                        alert("더 이상 재고가 없습니다!");
+                        return;
+                    }
+                    updateCartItemQuantity(itemId, currentValue + 1);
+                });
+
+
+                $('.countBox .minus').click(function() {
+                    const input = $(this).siblings('input');
+                    const currentValue = parseInt(input.val());
+                    const itemId = input.closest('li').find('.prodChk').data('id');
+
+                    if (currentValue <= 1) {
+                        alert("최소 구매 수량은 1개입니다.");
+                        return;
+                    }
+
+                    updateCartItemQuantity(itemId, currentValue - 1);
+                });
+
+                // 선택 삭제 버튼
+                $('.allChkBox .deleteBtn').click(function(e) {
+                    e.preventDefault();
+                    const selectedIds = updateSelectedItems();
+                    if (selectedIds.length === 0) {
+                        alert('삭제할 상품을 선택해주세요.');
+                        return;
+                    }
+                    if (confirm('선택한 상품을 삭제하시겠습니까?')) {
+                        selectedIds.forEach(deleteCartItem);
+                    }
+                });
+            }
+
+            // 체크된 항목 수 업데이트
+            function updateChkCount() {
+                const checkedCount = $('.prodChk:checked').length;
+                $('.chkCount').text(checkedCount);
+            }
+
+            // 선택된 항목 업데이트
+            function updateSelectedItems() {
+                const selectedIds = [];
+                $('.prodChk:checked').each(function() {
+                    selectedIds.push($(this).data('id'));
+                });
+                return selectedIds;
+            }
+
+            // 개별 상품 금액 업데이트
+            function updateItemTotal(item) {
+                const quantity = parseInt(item.find('.countBox input').val());
+                const price = parseInt(item.find('.price').text().replace(/[^0-9]/g, ''));
+                const total = quantity * price;
+
+                item.find('.totalPrice .prod span').text(total.toLocaleString() + '원');
+            }
+
+            // 장바구니 수량 업데이트
+            function updateCartItemQuantity(itemId, quantity) {
+                const item = $(`li:has(.prodChk[data-id="${itemId}"])`);
+                const input = item.find('.countBox input');
+                const selectedOptions = item.find('.option span').text();
+                const prevValue = input.val(); // 이전 값 저장
+
+                console.log('=== Cart Update Request Data ===');
+                console.log('Item ID:', itemId);
+                console.log('Quantity:', quantity);
+                console.log('Selected Options:', selectedOptions);
+                console.log('=====================');
+
+                $.ajax({
+                    url: '/cart/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: itemId,
+                        quantity: quantity,
+                        selectedOptions: selectedOptions
+                    }),
+                    success: function(response) {
+                        console.log('수량이 업데이트되었습니다.');
+                        input.val(quantity); // 성공 시에만 UI 업데이트
+                        updateItemTotal(item);
+                        updateCartTotal();
+                    },
+                    error: function(xhr) {
+                        console.error('수량 업데이트 실패:', xhr);
+                        input.val(prevValue); // 실패 시 이전 값으로 복원
+                        alert('수량 업데이트에 실패했습니다.');
+                    }
+                });
+            }
+
+
+            // 개별 상품 금액 업데이트
+            function updateItemTotal(item) {
+                const quantity = parseInt(item.find('.countBox input').val());
+                const price = parseInt(item.find('.price').text().replace(/[^0-9]/g, ''));
+                const total = quantity * price;
+
+                item.find('.totalPrice .prod span').text(total.toLocaleString() + '원');
+            }
+
+            // 장바구니 전체 금액 업데이트
+            function updateCartTotal() {
+                let totalProductPrice = 0;
+                let totalDeliveryFee = 0;
+                let uniqueProductCodes = new Set();
+
+                $('.cartList li').each(function() {
+                    const productCode = $(this).find('.prodImg').first().attr('href').split('/').pop();
+
+                    if (!uniqueProductCodes.has(productCode)) {
+                        const productFee = parseInt($(this).find('.fee span').text().replace(/[^0-9]/g, ''));
+                        totalDeliveryFee += productFee;
+                        uniqueProductCodes.add(productCode);
+                    }
+
+                    $(this).find('.list').each(function() {
+                        const quantity = parseInt($(this).find('.countBox input').val());
+                        const productSalePrice = parseInt($(this).find('.price').text().replace(/[^0-9]/g, ''));
+                        totalProductPrice += productSalePrice * quantity;
+                    });
+                });
+
+                const totalPrice = totalProductPrice + totalDeliveryFee;
+
+                $('.totalInfo li:nth-child(1) .txt').text(totalProductPrice.toLocaleString() + '원');
+                $('.totalInfo li:nth-child(2) .txt').text(totalDeliveryFee.toLocaleString() + '원');
+                $('.totalInfo li.total .txt').text(totalPrice.toLocaleString() + '원');
+                $('.orderBtnWrap .price').text(totalPrice.toLocaleString() + '원');
+            }
+
+
+
+            // 장바구니 항목 삭제
+            function deleteCartItem(itemId) {
+                $.ajax({
+                    url: '/cart/delete/' + itemId,
+                    type: 'POST',
+                    success: function(response) {
+                        $(`li:has(.prodChk[data-id="${itemId}"])`).remove();
+                        updateCartTotal();
+                        if ($('.cartList li').length === 0) {
+                            location.reload(); // 장바구니가 비었을 때 페이지 새로고침
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('삭제 실패:', xhr);
+                        alert('상품 삭제에 실패했습니다.');
+                    }
+                });
+            }
+
+            // 초기 렌더링
+            renderCartItems();
+        });
+    </script>
+</th:block>
+</body>
+</html>

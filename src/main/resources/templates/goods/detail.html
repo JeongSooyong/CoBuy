@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/userLayout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body class="productCont">
+<div layout:fragment="content">
+    <div class="prodDetailWrap">
+        <div class="swiper prodImgSlide">
+            <ul class="swiper-wrapper">
+                <li class="swiper-slide" th:each="image : ${product.productImages}">
+                    <div class="imgBox">
+                        <img th:src="${image.imageUrl}" th:alt="${product.productName}"/>
+                    </div>
+                </li>
+            </ul>
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <div class="prodDetailInner">
+            <div class="prodInfoWrap">
+                <p class="title" th:text="${product.productName}">상품명</p>
+                <p class="prodTxt" th:text="${product.productSummary}">상품 요약 설명</p>
+                <!--
+                <p class="priceBox">
+                    <span class="percent">36%</span>
+                    <span class="discount">31,900원</span>
+                    <span class="price">50,000원</span>
+                </p>
+                -->
+                <ul class="info">
+                    <li>
+                        <p class="tit">정상가</p>
+                        <p class="txt"><span class="cost" th:text="${#numbers.formatInteger(product.productOriPrice, 0, 'COMMA')} + '원'">50,000원</span></p>
+                    </li>
+                    <li class="discount">
+                        <p class="tit">판매가</p>
+                        <p class="txt">
+                            <span class="percent" th:text="${#numbers.formatInteger(T(java.lang.Math).ceil((product.productOriPrice - product.productSalePrice) * 100.0 / product.productOriPrice), 0, 'COMMA')} + '%'">36%</span>
+                            <span th:text="${#numbers.formatInteger(product.productSalePrice, 0, 'COMMA')} + '원'">31,900원</span>
+                        </p>
+                    </li>
+                    <li>
+                        <p class="tit">국내·해외배송</p>
+                        <p class="txt">국내배송</p>
+                    </li>
+                    <li>
+                        <p class="tit">배송방법</p>
+                        <p class="txt">택배</p>
+                    </li>
+                    <li class="delivery">
+                        <p class="tit">배송비</p>
+                        <p class="txt">
+                            <span class="bold" th:text="${#numbers.formatInteger(product.productFee, 0, 'COMMA')} + '원'">2,500원</span>
+                        </p>
+                    </li>
+                </ul>
+
+                <div class="optionList" th:if="${product.productOptionStatus != null and product.productOptionStatus.name() == 'OPTION_ON' and not #lists.isEmpty(product.productOptions)}">
+                    <div th:each="option, stat : ${product.productOptions}">
+                        <p class="tit" th:text="${option.optionName}">옵션</p>
+                        <select th:id="'prodOpt' + ${stat.index}" class="prodOpt" th:name="'prodOpt' + ${stat.index}">
+                            <option value="선택">[필수] 옵션을 선택해주세요.</option>
+                            <option th:each="value : ${#strings.arraySplit(option.optionValues, ';')}"
+                                    th:value="${value}"
+                                    th:text="${value}">옵션값</option>
+                        </select>
+                    </div>
+                </div>
+
+                <ul class="prodCntWrap" th:if="${product.productOptionStatus != null and product.productOptionStatus.name() == 'OPTION_OFF'}">
+                    <li>
+                        <div class="leftBox">
+                            <p class="tit" th:text="${product.productName}">상품명</p>
+                            <div class="countBox">
+                                <input id="quantity" type="number" value="1" min="1" th:max="${product.productStock}">
+                                <span class="plus">+</span>
+                                <span class="minus">-</span>
+                            </div>
+                        </div>
+                        <p class="price" th:text="${#numbers.formatInteger(product.productSalePrice, 0, 'COMMA')} + '원'">31,900원</p>
+                    </li>
+                </ul>
+                <div class="totalPrice">
+                    <p class="tit">총 상품 금액</p>
+                    <p class="total">
+                        <span th:text="${#numbers.formatInteger(product.productSalePrice, 0, 'COMMA')} + '원'">31,900원</span>
+                        <span class="count">(1개)</span>
+                    </p>
+                </div>
+
+                <div class="buyWrap">
+                    <a class="cartBtn" href="#" onclick="addToCart(event)">장바구니 담기</a>
+                    <a class="payBtn" href="/pay">결제하기</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="prodContWrap">
+            <ul class="tabWrap">
+                <li><a class="active" href="#tab01">상품 상세정보</a></li>
+                <li><a href="#tab02">배송안내</a></li>
+                <li><a href="#tab03">교환 및 반품안내</a></li>
+            </ul>
+
+            <div class="tabCont active" id="tab01" th:utext="${product.productContents}">
+                <!-- 상품 상세 정보가 여기에 들어갑니다 -->
+            </div>
+
+            <ul class="tabCont cont01" id="tab02">
+                <li>
+                    <p class="tit">배송안내</p>
+                    <p class="txt">
+                        - 20,000원 이상 구매 시 무료배송이며, 기본배송료는 2,500원 입니다. (도서, 산간, 오지 일부지역은 배송비가 추가될 수 있습니다)<br>
+                        - 본 상품의 평균 배송일은 결제완료 후 2일입니다. 배송예정일은 주문시점(주문순서)에 따른 유동성이 발생하므로 평균 배송일과는 차이가 발생할 수 있습니다.
+                    </p>
+                </li>
+            </ul>
+            <ul class="tabCont cont01" id="tab03">
+                <li>
+                    <p class="tit">교환 및 반품 안내</p>
+                    <p class="txt">
+                        - 상품 개봉으로 상품 가치 훼손 시에는 상품수령후 7일 이내라도 교환 및 반품이 불가능합니다.<br>
+                        - 저단가 상품, 일부 특가 상품은 고객 변심에 의한 교환, 반품은 고객께서 배송비를 부담하셔야 합니다(제품의 하자,배송오류는 제외)<br>
+                        - 일부 특가 상품의 경우, 인수 후에는 제품 하자나 오배송의 경우를 제외한 고객님의 단순변심에 의한 교환, 반품이 불가능할 수 있사오니, 각 상품의 상품상세정보를 꼭
+                        참조하십시오.
+                    </p>
+                </li>
+                <li>
+                    <p class="tit">환불안내</p>
+                    <p class="txt">
+                        - 상품 청약철회 가능기간은 상품 수령일로 부터 7일 이내 입니다.
+                    </p>
+                </li>
+                <li>
+                    <p class="tit">AS안내</p>
+                    <p class="txt">
+                        - 소비자분쟁해결 기준(공정거래위원회 고시)에 따라 피해를 보상받을 수 있습니다.<br>
+                        - A/S는 판매자에게 문의하시기 바랍니다.
+                    </p>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <ul class="quickMenu">
+        <li><a class="chat" href="#">채팅 문의</a></li>
+        <li><a class="top" href="#">TOP</a></li>
+    </ul>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        // jQuery가 로드되었는지 확인
+        if (typeof jQuery === 'undefined') {
+            console.error('jQuery is not loaded!');
+        } else {
+            console.log('jQuery is loaded');
+        }
+
+        // 옵션 선택 이벤트 처리
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+
+            const optionSelects = document.querySelectorAll('.prodOpt');
+            if (optionSelects.length > 0) {
+                console.log('Found option selects:', optionSelects.length);
+
+                // 모든 옵션 선택 이벤트에 리스너 추가
+                optionSelects.forEach(select => {
+                    select.addEventListener('change', function() {
+                        console.log('Option changed:', this.id, this.value);
+                        checkAllOptionsSelected();
+                    });
+                });
+            }
+        });
+
+        // 모든 옵션이 선택되었는지 확인하는 함수
+        function checkAllOptionsSelected() {
+            const optionSelects = document.querySelectorAll('.prodOpt');
+            const allSelected = Array.from(optionSelects).every(select => select.value !== '선택');
+
+            if (allSelected) {
+                // 기존 prodCntWrap 제거
+                const existingWrap = document.querySelector('.prodCntWrap');
+                if (existingWrap) {
+                    existingWrap.remove();
+                }
+
+                // 새로운 prodCntWrap 생성
+                const prodCntWrap = document.createElement('ul');
+                prodCntWrap.className = 'prodCntWrap';
+
+                const productName = /*[[${product.productName}]]*/ '';
+                const productStock = /*[[${product.productStock}]]*/ 0;
+                const productSalePrice = /*[[${product.productSalePrice}]]*/ 0;
+
+                // 선택된 모든 옵션값 가져오기
+                const selectedOptions = Array.from(document.querySelectorAll('.prodOpt'))
+                    .map(select => select.value)
+                    .join(' / ');
+
+                prodCntWrap.innerHTML = `
+                    <li>
+                        <div class="leftBox">
+                            <p class="tit">${productName}</p>
+                            <p class="option">${selectedOptions}</p>
+                            <div class="countBox">
+                                <input type="number" value="1" min="1" max="${productStock}">
+                                <span class="plus">+</span>
+                                <span class="minus">-</span>
+                            </div>
+                        </div>
+                        <p class="price">${productSalePrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</p>
+                    </li>
+                `;
+
+                document.querySelector('.optionList').after(prodCntWrap);
+                updateTotalPrice();
+            } else {
+                // 옵션이 모두 선택되지 않은 경우 prodCntWrap 제거
+                const existingWrap = document.querySelector('.prodCntWrap');
+                if (existingWrap) {
+                    existingWrap.remove();
+                }
+                updateTotalPrice();
+            }
+        }
+
+        // 총 가격 업데이트 함수
+        function updateTotalPrice() {
+            console.log('Updating total price');
+            const productSalePrice = /*[[${product.productSalePrice}]]*/ 0;
+            let totalQuantity = 0;
+            let totalPrice = 0;
+
+            // 모든 수량 입력 필드에 대해 처리
+            document.querySelectorAll('.prodCntWrap input[type="number"]').forEach(function(input) {
+                const quantity = parseInt(input.value);
+                totalQuantity += quantity;
+                totalPrice += productSalePrice * quantity;
+
+                // 개별 상품의 가격 업데이트
+                const priceElement = input.closest('li').querySelector('.price');
+                if (priceElement) {
+                    const itemPrice = productSalePrice * quantity;
+                    priceElement.textContent = itemPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '원';
+                }
+            });
+
+            console.log('Total Price Calculation:', {
+                totalQuantity,
+                totalPrice,
+                productSalePrice
+            });
+
+            // 총 가격 업데이트
+            const formattedTotalPrice = totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            const totalElement = document.querySelector('.totalPrice .total');
+            if (totalElement) {
+                totalElement.innerHTML = `${formattedTotalPrice}원 <span class="count">(${totalQuantity}개)</span>`;
+            }
+        }
+
+        // 수량 변경 이벤트
+        $(document).on('change', '#quantity, .prodCntWrap input[type="number"]', function() {
+            console.log('Quantity changed');
+            updateTotalPrice();
+        });
+
+        // jQuery를 사용한 수량 증가/감소 버튼 이벤트
+        $(document).on('click', '.countBox .plus', function() {
+            const input = $(this).siblings('input');
+            const currentValue = parseInt(input.val());
+            const maxValue = parseInt(input.attr('max'));
+
+            if (currentValue < maxValue) {
+                input.val(currentValue + 1).trigger('change');
+            } else {
+                alert("더 이상 재고가 없습니다!");
+            }
+        });
+
+        $(document).on('click', '.countBox .minus', function() {
+            const input = $(this).siblings('input');
+            const currentValue = parseInt(input.val());
+
+            if (currentValue > 1) {
+                input.val(currentValue - 1).trigger('change');
+            } else {
+                alert("최소 구매 수량은 1개입니다.");
+            }
+        });
+
+        // 직접 입력 시 0 이하의 값이 들어가면 경고
+        $(document).on('input', '.countBox input', function() {
+            const value = parseInt($(this).val());
+            const maxValue = parseInt($(this).attr('max'));
+
+            if (value < 1) {
+                alert("최소 구매 수량은 1개입니다.");
+                $(this).val(1).trigger('change');
+            } else if (value > maxValue) {
+                alert("더 이상 재고가 없습니다!");
+                $(this).val(maxValue).trigger('change');
+            }
+        });
+
+        // 장바구니에 상품 추가
+        function addToCart(event) {
+            event.preventDefault();
+
+            const productId = /*[[${product.id}]]*/ '';
+            const adminId = /*[[${product.adminId}]]*/ '';
+            const productCode = /*[[${product.productCode}]]*/ '';
+            const productName = /*[[${product.productName}]]*/ '';
+            const productOriPrice = /*[[${product.productOriPrice}]]*/ 0;
+            const productSalePrice = /*[[${product.productSalePrice}]]*/ 0;
+            const productStock = /*[[${product.productStock}]]*/ 0;
+            const productFee = /*[[${product.productFee}]]*/ 0;
+
+            let selectedOptions = '';
+            const optionSelects = document.querySelectorAll('.prodOpt');
+            if (optionSelects.length > 0) {
+                selectedOptions = Array.from(optionSelects)
+                    .map(select => select.value)
+                    .filter(value => value !== '선택')
+                    .join(' / ');
+            }
+
+            const quantity = parseInt(document.querySelector('.prodCntWrap input[type="number"]').value);
+
+            const cartItem = {
+                id: productId,
+                adminId: adminId,
+                productCode: productCode,
+                productName: productName,
+                selectedOptions: selectedOptions,
+                quantity: quantity,
+                productOriPrice: productOriPrice,
+                productSalePrice: productSalePrice,
+                productStock: productStock,
+                productFee: productFee,
+                imageUrl: document.querySelector('.prodImgSlide img').src
+            };
+
+            console.log('=== Cart Request Data ===');
+            console.log('Product ID:', productId);
+            console.log('Admin ID:', adminId);
+            console.log('Product Code:', productCode);
+            console.log('Product Name:', productName);
+            console.log('Selected Options:', selectedOptions);
+            console.log('Quantity:', quantity);
+            console.log('Product Sale Price:', productSalePrice);
+            console.log('Product Fee:', productFee);
+            console.log('Image URL:', cartItem.imageUrl);
+            console.log('CSRF Token:', /*[[${_csrf.token}]]*/ '');
+            console.log('=====================');
+
+            // 장바구니에 상품 추가
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': /*[[${_csrf.token}]]*/ ''
+                },
+                body: JSON.stringify(cartItem)
+            })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text || '장바구니 추가에 실패했습니다.');
+                        });
+                    }
+                    return response.text();
+                })
+                .then(result => {
+                    console.log('Response result:', result);
+                    alert(result || '장바구니에 상품이 추가되었습니다.');
+                    window.location.href = '/cart';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(error.message || '장바구니 추가 중 오류가 발생했습니다. 다시 시도해주세요.');
+                });
+        }
+    </script>
+</th:block>
+</body>
+</html>

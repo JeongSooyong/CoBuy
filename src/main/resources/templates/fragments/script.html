@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="script">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!--swiper-->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- 위지윅 에디터 추가 -->
+    <script src="https://cdn.tiny.cloud/1/8chai5d9t0drtkgfoqke08hjuryurgkq5pfiiikof2btlqz5/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
+    <!--카카오 주소검색-->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script th:src="@{/js/kakaoAddress.js}" defer></script>
+
+    <script th:src="@{/js/tab.js}"></script>
+    <script th:src="@{/js/menu.js}"></script>
+    <script th:src="@{/js/prodSwiper.js}"></script>
+    <script th:src="@{/js/product.js}"></script>
+    <script th:src="@{/js/chat.js}"></script>
+    <script th:src="@{/js/editer.js}"></script>
+    <script th:src="@{/js/admin/menu.js}"></script>
+    <script th:src="@{/js/admin/product.js}"></script>
+    <script th:src="@{/js/admin/modal.js}"></script>
+    <script th:src="@{/js/admin/message.js}"></script>
+    <script th:src="@{/js/admin/order.js}"></script>
+    <script th:src="@{/js/admin/addSearch.js}"></script>
+    <script th:src="@{/js/admin/request.js}"></script>
+    <script th:src="@{/js/admin/manage.js}"></script>
+    <script th:src="@{/js/admin/match.js}"></script>
+</div>

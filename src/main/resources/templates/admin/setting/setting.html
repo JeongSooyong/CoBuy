@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html
+    layout:decorate="~{layouts/adminLayout}"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>환경설정</title>
+</head>
+<body class="bodyCont">
+<div layout:fragment="content">
+    <div class="adminWrap settingWrap">
+        <div class="titleWrap">
+            <h3 class="title">환경설정</h3>
+        </div>
+        <div class="setWrap">
+            <form th:action="@{/admin/setting}" method="post" enctype="multipart/form-data" th:object="${setting}">
+                <input type="hidden" th:field="*{adminNo}"/>
+                <div class="tableWrap tableWrap02">
+                    <table>
+                        <colgroup>
+                            <col style="width:220px;">
+                            <col style="width:calc(100% - 220px);">
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th>쇼핑몰명</th>
+                            <td>
+                                <div class="txtBox">
+                                    <input type="text" th:field="*{adminShopName}" readonly>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>로고</th>
+                            <td>
+                                <div class="txtBox">
+                                    <input type="file" name="logoFile" accept="image/*">
+                                    <span class="info">권장 사이즈 200px * 60px </span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>배송안내</th>
+                            <td>
+                                <div class="txtBox">
+                                    <textarea th:field="*{settingFee}" placeholder="배송안내 문구를 입력해주세요."></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>교환 및 반품 안내</th>
+                            <td>
+                                <div class="txtBox">
+                                    <textarea th:field="*{settingExchange}" placeholder="교환 및 반품 안내 문구를 입력해주세요."></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>환불안내</th>
+                            <td>
+                                <div class="txtBox">
+                                    <textarea th:field="*{settingRefund}" placeholder="환불안내 문구를 입력해주세요."></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>AS안내</th>
+                            <td>
+                                <div class="txtBox">
+                                    <textarea th:field="*{settingAs}" placeholder="AS안내 문구를 입력해주세요."></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <input type="hidden" th:field="*{settingId}">
+                <div class="btnWrap">
+                    <button type="submit">저장</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
