@@ -27,7 +27,7 @@
 
 ![image](https://github.com/user-attachments/assets/70653f21-d23e-4232-a343-8069ecc32585)<br>
 회원가입 화면<br>
-테이블을 쇼핑몰, 셀러, 회원 3가지로 나누어서 회원가입
+테이블을 쇼핑몰, 셀러, 회원 3가지로 나누어서 회원가입<br>
 ![image](https://github.com/user-attachments/assets/262fc912-cc53-4395-948c-7010926721bf)
 
 <br>
