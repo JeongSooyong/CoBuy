@@ -22,6 +22,39 @@
 
 
 
+<br><br><br><br>
+
+![image](https://github.com/user-attachments/assets/70653f21-d23e-4232-a343-8069ecc32585)<br>
+회원가입 화면<br>
+테이블을 쇼핑몰, 셀러, 회원 3가지로 나누어서 회원가입
+![image](https://github.com/user-attachments/assets/2bf7e089-fdd6-4dcf-b617-574204e81da4)
+<br>
+아이디 중복 체크 기능
+<br>
+![image](https://github.com/user-attachments/assets/6848bfdd-fc02-402d-a725-6709dac6075c)
+<br>
+카카오 주소검색 API 사용
+
+
+<br><br><br><br>
+![image](https://github.com/user-attachments/assets/e3b18ed6-8002-4517-8361-423ca45c6def)
+<br> 카테고리별로 쇼핑몰명 또는 카테고리명으로 검색시 일치하는 쇼핑몰이 나온다. <br>
+
+<br><br><br><br>
+![image](https://github.com/user-attachments/assets/930e37cf-5701-4319-ac57-8616afd96cb3)
+<br>
+상품코드는 중복이 안되고, 직접입력시 해당 코드로 사용가능하도록 했다.
+<br>
+자동생성시 P00000001부터 자동으로 1씩 증가한 코드로 생성된다.
+<br>
+![image](https://github.com/user-attachments/assets/e322cfe3-45d4-4015-9cb1-3f9f9974d04a)
+<br>
+상품 등록화면
+
+
+
+
+
 
 
   
